@@ -5,7 +5,9 @@ The final target of this project is to make functions that automatically generat
 
 An example figure looks like:
 
-![Alt text](China_landleasing/landchina_2013.png)
+![Alt text](cases/China_landleasing/landchina_2013.png)
+
+For more examples please visit the folder "/cases".
 
 Python packages required for the project:
 
