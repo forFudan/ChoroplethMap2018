@@ -1,7 +1,7 @@
 # ChoroplethMap
 Draw choropleth maps.
 
-The final target of this project is to make functions that automatically generate maps with parameters and the data set.
+The next step of this project is to make functions that automatically generate maps with parameters and the data set.
 
 An example figure looks like:
 
@@ -65,3 +65,9 @@ from descartes import PolygonPatch
 import fiona
 from itertools import chain
 ```
+
+---
+
+### Versions:
+- 20160401: The creation of the project for visualizing the projects on German establishments. Use .ipynb files.
+- 20180426: Transport to .py files and make it more customized for different parameters.
