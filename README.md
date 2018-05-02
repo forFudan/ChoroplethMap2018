@@ -1,5 +1,5 @@
 # ChoroplethMap
-Draw choropleth maps.
+Draw choropleth maps. I recommend that you use macos or linux. Installing packages on PC is annoying, and be sure to use conda instead of pip. However, sometimes it also brings trouble. Try to conda remove geopandas, fiona and shapely and use pip install for them.
 
 The next step of this project is to make functions that automatically generate maps with parameters and the data set.
 
@@ -22,6 +22,26 @@ or use
 ```    
 conda install basemap
 ```
+or on PC, download packages from http://www.lfd.uci.edu/~gohlke/pythonlibs/. For example:
+
+basemap-1.1.0-cp35-cp35m-win_amd64.whl.
+
+Move to the folder of the file in Powershell and
+```
+conda install pyproj
+pip install basemap-XXX-corresponding-file-version
+```
+
+#### geopandas
+```
+pip install geopandas
+```
+
+#### fiona
+```
+pip install fiona    
+```
+click-plugins-1.0.3 cligj-0.4.0 fiona-1.7.11.post1 munch-2.3.1
 
 #### shapely
 ```
@@ -40,12 +60,6 @@ pysal-1.14.3
 pip install descartes    
 ```
 descartes-1.1.0
-
-#### fiona
-```
-pip install fiona    
-```
-click-plugins-1.0.3 cligj-0.4.0 fiona-1.7.11.post1 munch-2.3.1
 
 ### Imports
 ```
