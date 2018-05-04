@@ -1,4 +1,4 @@
-#%%
+# %%
 # Packages
 from lxml import etree
 import pandas as pd
@@ -17,7 +17,7 @@ import fiona
 import geopandas
 #from itertools import chain
 from copy import deepcopy
-#%matplotlib inline
+# %matplotlib inline
 
 # Import functions
 from include.map import cmap_discretize
@@ -40,7 +40,7 @@ path_output = 'output/landchina_2013_2016.png'
 extra = 0.01
 
 
-#%%
+# %%
 """
 Fiona first read the map shape file downloaded from https://gadm.org/.
 When download the shapefile, be careful in which level of admin region you are downloading.
@@ -72,19 +72,19 @@ Then use this instance to read in the shape files.
 """
 
 map_china = Basemap(
-    projection = 'tmerc',
-    lon_0 = (south + north) / 2, # Longitude center
-    lat_0 = (west + east) / 2, # Latitude center
-    ellps = 'WGS84',
+    projection='tmerc',
+    lon_0=(south + north) / 2,  # Longitude center
+    lat_0=(west + east) / 2,  # Latitude center
+    ellps='WGS84',
     # Adjustment to the border of the map
-    llcrnrlon = south - extra + 0.05 * width,
-    llcrnrlat = west - extra - 0.1 * height,
-    urcrnrlon = north + extra + 0.05 * width,
-    urcrnrlat = east + extra - 0.1 * height,
-    lat_ts = 0,
-    resolution = 'i',
-    suppress_ticks = True
-    )
+    llcrnrlon=south - extra + 0.05 * width,
+    llcrnrlat=west - extra - 0.1 * height,
+    urcrnrlon=north + extra + 0.05 * width,
+    urcrnrlat=east + extra - 0.1 * height,
+    lat_ts=0,
+    resolution='i',
+    suppress_ticks=True
+)
 
 map_taiwan = deepcopy(map_china)
 
@@ -92,19 +92,19 @@ print('The frame of the map frame created!')
 
 map_china.readshapefile(
     path_china,
-    name = 'china',
-    color = 'none',
-    zorder = 2 )
+    name='china',
+    color='none',
+    zorder=2)
 
 map_taiwan.readshapefile(
     path_taiwan,
-    name= 'taiwan' ,
-    color= 'none' ,
-    zorder = 2)
+    name='taiwan',
+    color='none',
+    zorder=2)
 
 print('Basemap has read the shape files.')
 
-#%%
+# %%
 """
 Prepare for the data in each region.
 The data is prepared using DataFrame.
@@ -118,9 +118,9 @@ If you directly use Polygon on the data, error raises:
 Shell is not a LinearRing
 So you first run the test polygon. Then you use it on the data.
 """
-test_polygon = Polygon([(0,0),(1,1),(1,0)])
+test_polygon = Polygon([(0, 0), (1, 1), (1, 0)])
 
-poly_china = [Polygon(shape) for shape in map_china.china] 
+poly_china = [Polygon(shape) for shape in map_china.china]
 poly_taiwan = [Polygon(shape) for shape in map_taiwan.taiwan]
 region_china = [region['NAME_3'] for region in map_china.china_info]
 region_taiwan = [region['NAME_2'] for region in map_taiwan.taiwan_info]
@@ -130,10 +130,12 @@ df_map_china = pd.DataFrame({
     'poly': poly_china,
     'region': region_china})
 
+# Calculate the area
 df_map_china['poly_area_m2'] = df_map_china['poly'].map(lambda x: x.area)
 df_map_china['poly_area_km2'] = df_map_china['poly_area_m2'] / 1000000
 df_map_china['poly_area_100km2'] = df_map_china['poly_area_km2'] / 100
-df_map_china['region_area_m2'] = df_map_china.region.apply(df_map_china.groupby('region').sum().poly_area_m2.get_value)
+df_map_china['region_area_m2'] = df_map_china.region.apply(
+    df_map_china.groupby('region').sum().poly_area_m2.get_value)
 df_map_china['region_area_km2'] = df_map_china['region_area_m2'] / 1000000
 df_map_china['region_area_100km2'] = df_map_china['region_area_km2'] / 100
 
@@ -141,20 +143,24 @@ df_map_china['region_area_100km2'] = df_map_china['region_area_km2'] / 100
 df_map_taiwan = pd.DataFrame({
     'poly': poly_taiwan,
     'region': region_taiwan})
+
+# Calculate the area
 df_map_taiwan['poly_area_m2'] = df_map_taiwan['poly'].map(lambda x: x.area)
 df_map_taiwan['poly_area_km2'] = df_map_taiwan['poly_area_m2'] / 1000000
 df_map_taiwan['poly_area_100km2'] = df_map_taiwan['poly_area_km2'] / 100
-df_map_taiwan['region_area_m2'] = df_map_taiwan.region.apply(df_map_taiwan.groupby('region').sum().poly_area_m2.get_value)
+df_map_taiwan['region_area_m2'] = df_map_taiwan.region.apply(
+    df_map_taiwan.groupby('region').sum().poly_area_m2.get_value)
 df_map_taiwan['region_area_km2'] = df_map_taiwan['region_area_m2'] / 1000000
 df_map_taiwan['region_area_100km2'] = df_map_taiwan['region_area_km2'] / 100
 
-print('Area calculated!')
 
 rows_china = df_map_china.poly.count()
 rows_taiwan = df_map_taiwan.poly.count()
-df_map_taiwan.set_index([list(range(rows_china+1, rows_china+rows_taiwan+1))], inplace=True)
+df_map_taiwan.set_index(
+    [list(range(rows_china+1, rows_china+rows_taiwan+1))], inplace=True)
 
 
+#%%
 """
 Combine the maps.
 """
@@ -169,12 +175,17 @@ df_price = pd.read_csv(path_data_file)
 df_map = pd.merge(df_map, df_price, how='left', on='region')
 
 
-df_map['density_m2'] = df_map['price(million)'] / df_map['region_area_m2'] /100
-df_map['density_km2'] = df_map['price(million)'] / df_map['region_area_km2'] /100
-df_map['density_100km2'] = df_map['price(million)'] / df_map['region_area_100km2'] /100
+df_map['density_m2'] = df_map['price(million)'] / \
+    df_map['region_area_m2'] / 100
+df_map['density_km2'] = df_map['price(million)'] / \
+    df_map['region_area_km2'] / 100
+df_map['density_100km2'] = df_map['price(million)'] / \
+    df_map['region_area_100km2'] / 100
 
-df_map.replace(to_replace={'density_m2': {0: np.nan}, 'density_km2': {0: np.nan}, 'density_100km2': {0: np.nan}}, inplace=True)
+df_map.replace(to_replace={'density_m2': {0: np.nan}, 'density_km2': {
+               0: np.nan}, 'density_100km2': {0: np.nan}}, inplace=True)
 
+#%%
 """
 # Calculate Jenks natural breaks for density
 breaks = nb(
@@ -194,8 +205,10 @@ print(max(list(df_map['density_100km2'].values)))
 
 
 breaks = [0., 8., 128., 2048., 16384., 262144.] + [1e20]
-df_map['jenks_bins'] = df_map['density_100km2'].apply(self_categorize, args=(breaks,))
-jenks_labels = ["<= {:d} million RMB per 100 km$^2$".format(int(perc)) for perc in breaks[1:-1]]
+df_map['jenks_bins'] = df_map['density_100km2'].apply(
+    self_categorize, args=(breaks,))
+jenks_labels = ["<= {:d} million RMB per 100 km$^2$".format(
+    int(perc)) for perc in breaks[1:-1]]
 
 print(jenks_labels)
 
@@ -203,7 +216,7 @@ print(jenks_labels)
 print(min(list(df_map['jenks_bins'].values)))
 print(max(list(df_map['jenks_bins'].values)))
 
-#%%
+# %%
 """
 Plot the map.
 """
@@ -217,7 +230,8 @@ ax = fig.add_subplot(111, frame_on=False)
 cmap = plt.get_cmap('Blues')
 
 # draw wards with grey outlines
-df_map['patches'] = df_map['poly'].map(lambda x: PolygonPatch(x, ec='#555555', lw=.2, alpha=0.75, zorder=4))
+df_map['patches'] = df_map['poly'].map(lambda x: PolygonPatch(
+    x, ec='#555555', lw=.2, alpha=0.75, zorder=4))
 pc = PatchCollection(df_map['patches'], match_original=True)
 
 # impose our colour map onto the patch collection
@@ -226,7 +240,8 @@ pc.set_facecolor(cmap(norm(df_map['jenks_bins'].values)))
 ax.add_collection(pc)
 
 # Add a colour bar
-cb = colorbar_index(ncolors=len(jenks_labels), cmap=cmap, shrink=0.3, labels=jenks_labels)
+cb = colorbar_index(ncolors=len(jenks_labels), cmap=cmap,
+                    shrink=0.3, labels=jenks_labels)
 cb.ax.tick_params(labelsize=7)
 
 # # Show highest densities, in descending order
@@ -273,6 +288,6 @@ ax.set_title('China Land Leasing at County Level from 2013 to 2016')
 # this will set the image width
 # plt.tight_layout()
 plt.subplots_adjust(left=-0.02)
-fig.set_size_inches(10,8)
+fig.set_size_inches(10, 8)
 plt.savefig(path_output, dpi=720, alpha=True)
 plt.show()
