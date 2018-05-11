@@ -15,7 +15,7 @@ from pysal.esda.mapclassify import Natural_Breaks as nb
 from descartes import PolygonPatch
 import fiona
 import geopandas
-#from itertools import chain
+from itertools import chain
 from copy import deepcopy
 # %matplotlib inline
 
@@ -24,6 +24,7 @@ from include.map import cmap_discretize
 from include.map import colorbar_index
 from include.map import self_categorize
 
+#%%
 """
 Start of the main program
 """
@@ -220,24 +221,33 @@ print(max(list(df_map['jenks_bins'].values)))
 Plot the map.
 """
 
+# Clear the current any figure.
 plt.clf()
+
+# Create an instance of figure.
 fig = plt.figure()
 ax = fig.add_subplot(111, frame_on=False)
 
+
+#%%
 """
 Transfer the color to blue.
 """
 # http://matplotlib.org/examples/color/colormaps_reference.html
 cmap = plt.get_cmap('Blues')
 
-# Draw the regions using gray bolders.
+# Draw the regions using gray bolder.
 df_map['patches'] = df_map['poly'].map(lambda x: PolygonPatch(x, ec='#555555', lw=.2, alpha=0.75, zorder=4))
 pc = PatchCollection(df_map['patches'], match_original=True)
 
+
+#%%
 # Put the map on the patches.
 norm = Normalize()
 pc.set_facecolor(cmap(norm(df_map['jenks_bins'].values)))
 ax.add_collection(pc)
+
+#%%
 
 # Put the color bar onto the map.
 cb = colorbar_index(ncolors=len(jenks_labels), cmap=cmap,
@@ -257,6 +267,9 @@ cb.ax.tick_params(labelsize=7)
 #     size=5,
 #     color='#555555')
 
+#%%
+
+
 # The bin methods and other information.
 smallprint = ax.text(
     1, 0.1,
@@ -266,13 +279,14 @@ smallprint = ax.text(
     color='#555555',
     transform=ax.transAxes)
 
-map_taiwan.scatter(
+#%%
+map_china.scatter(
     [geom.x for geom in []],
     [geom.y for geom in []],
     15, marker='o', lw=.5,
     facecolor='grey', edgecolor='w',
     alpha=1.0, antialiased=True,
-    label='Million RMB per square kilometers of land sold 2013 to 2016', zorder=3, ax=ax,)
+    label='', zorder=3, ax=ax)
 
 
 # Draw a map scale
@@ -282,11 +296,12 @@ map_taiwan.scatter(
 #     fillcolor1='w', fillcolor2='#555555', fontcolor='#555555',
 #     zorder=0, ax=ax,)
 
+#%%
 ax.set_title('China Land Leasing at County Level from 2013 to 2016')
 
+#%%
 # this will set the image width
 # plt.tight_layout()
-plt.subplots_adjust(left=-0.02)
+fig.subplots_adjust(left=-0.02)
 fig.set_size_inches(10, 8)
-plt.savefig(path_output, dpi=720, alpha=True)
-plt.show()
+fig.savefig(path_output, dpi=720, alpha=True)
